@@ -1,0 +1,8 @@
+*.sublime-project
+*.sublime-workspace
+*.egg-info/
+*.pyc
+dist
+build
+_*
+release.sh
