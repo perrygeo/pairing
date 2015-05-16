@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='pairing',
-    version='0.1',
-    py_modules=['pairing'],
-    long_description=("See https://github.com/perrygeo/pairing")
+    version="0.1.3",
+    packages=['pairing'],
+    long_description=("See https://github.com/perrygeo/pairing"),
     author="Matthew Perry",
     author_email="perrygeo@gmail.com",
     description=("Encode pairs of integers as single integer values using the Cantor pairing algorithm"),
