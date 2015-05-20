@@ -2,7 +2,7 @@
 # Pairing functions for Python
 
 Pairing functions take two integers and give you one integer in return. What makes a pairing function special is that it is *invertable*; You can
-reliably depair the same integer value back into it's two original values in the original order. Besides their [interesting mathematical properties](http://mathworld.wolfram.com/PairingFunction.html), pairing functions have some practical uses in software development in a very specific use case: Hiding two integer values as a single integer.
+reliably depair the same integer value back into it's two original values in the original order. Besides their [interesting mathematical properties](http://mathworld.wolfram.com/PairingFunction.html), pairing functions have some practical uses in software development.
 
 This is a python implementation of the [Cantor pairing
 function](http://en.wikipedia.org/wiki/Pairing_function#Cantor_pairing_function)
@@ -88,7 +88,7 @@ which keys to pair/depair. There are many reasons why not to choose this route
 
 ## Limitations
 
-**TL;DR** Use non-negative integers that are not ridiculously large.
+**TL;DR** Use non-negative integers that are not ridiculously large (less than 16 digits).
 
 First off, negative values are not supported
 
@@ -100,39 +100,43 @@ Zeros are fine
 
 We can iterate through a range of integers and confirm that this works perfectly, at least for a certain range of positive integers
 
-    for i in range(8,52,4):
+    for i in range(9,52,3):
         p = pair(2**i, 2**i)
         print p, "(2^{i}, 2^{i})".format(i=i)
 
-    131584 (2^8, 2^8)
+    525312 (2^9, 2^9)
     33562624 (2^12, 2^12)
-    8590065664 (2^16, 2^16)
-    2199025352704 (2^20, 2^20)
+    2147549184 (2^15, 2^15)
+    137439477760 (2^18, 2^18)
+    8796097216512 (2^21, 2^21)
     562949986975744 (2^24, 2^24)
-    144115188612726784 (2^28, 2^28)
-    36893488156009037824 (2^32, 2^32)
+    36028797287399424 (2^27, 2^27)
+    2305843011361177600 (2^30, 2^30)
+    147573952606856282112 (2^33, 2^33)
     9444732965876729380864 (2^36, 2^36)
-    2417851639231457372667904 (2^40, 2^40)
-    618970019642725321821650944 (2^44, 2^44)
+    604462909808414098980864 (2^39, 2^39)
+    38685626227676929683619840 (2^42, 2^42)
+    2475880078570830918542426112 (2^45, 2^45)
     158456325028529238137041321984 (2^48, 2^48)
+    10141204801825839715573253013504 (2^51, 2^51)
 
 
-... until it doesn't. There do exist practical limits on the size of inputs
-given that `long` integers are represented with arbitrary precision. With very large numbers, silent bugs can manifest in
-ways that might catch you off-gaurd if you're not aware.
+But there do exist practical limits on the size of inputs.
+In Python, `long` integers are implemented with <a href="http://en.wikipedia.org/wiki/Double-precision_floating-point_format#IEEE_754_double-precision_binary_floating-point_format:_binary64">double-precision floating points</a> and can represent integers exactly... up to a certain point. With numbers greater than 2<sup>51</sup>, long integers are not guaranteed to be exact and can result in silent bugs that could catch you off-gaurd if you're not aware.
 
 
-    values = (2**52, 2**52)                # (4503599627370496, 4503599627370496)
-    encoded = pair(*values, safe=False)    # 40564819207303340847894502572032L
-    depair(encoded)                        # (9007199254740992L, 0L)
+    values = (2**51 + 1, 2**51 + 1)        # (2251799813685249, 2251799813685249)
+    encoded = pair(*values, safe=False)    # 10141204801825848722772507754496L
+    depair(encoded)                        # (2251799813685250, 2251799813685248)
 
-That's not good. Noticed that we turned turned `safe=False` which allows these sorts of silent errors. Let's not fail silently! Using the default `safe=True` will perform a full pair-depair cycle and confirm that
-the values are stable. If not, the function will raise a `ValueError` by default:
+That's not good. Noticed that we specified `safe=False` which allows these sorts of errors to pass without warning. 
+
+Let's not fail silently! Using the default `safe=True` will perform a full pair-depair cycle and confirm that
+the values are stable. If not, the function will raise a `ValueError`:
 
 
     encoded = pair(*values)
-    # ValueError: 4503599627370496 and 4503599627370496 cannot be paired
-
+    # ValueError: 2251799813685249 and 2251799813685249 cannot be paired
 
 
 ## Tests
@@ -144,3 +148,4 @@ Try the test and benchmark script first:
     Benchmarking...
     0.47101 sec, 20000 iterations
 
+Tested on python3.4, python2.7, pypy
