@@ -49,39 +49,40 @@ it in a numpy `ndarray`. While numpy supports tuples, they will not give you the
 best **performance** and are not a supported data type for many numpy
 optimization techniques. For example, you could perform the `pair` algebra using `numexpr` to gain big speedups over any numpy manipulation and tuple data types to achieve the same effect.
 
-    ```
-    import numexpr as ne
-    import numpy as np
-    from pairing import depair
+```
+import numexpr as ne
+import numpy as np
+from pairing import depair
 
-    a = np.random.randint(101, 103, (4, 3))
-    b = np.random.randint(101, 103, (4, 3))
-    paired = ne.evaluate("0.5 * (a + b) * (a + b + 1) + b")
+a = np.random.randint(101, 103, (4, 3))
+b = np.random.randint(101, 103, (4, 3))
+paired = ne.evaluate("0.5 * (a + b) * (a + b + 1) + b")
 
-    assert depair(paired[2, 2]) == (a[2, 2], b[2, 2])
-    ```
+assert depair(paired[2, 2]) == (a[2, 2], b[2, 2])
+```
 
-* You have two-integer tuples as keys and want to
-**serialize** the data to JSON, which does not allow collections as keys.
-    ```
+
+* You have two-integer tuples as keys and want to **serialize** the data to JSON, which does not allow collections as keys.
+
+```python
 >>> d = {(22, 33):'foo'}
 >>> json.dumps(d)
 Traceback (most recent call last):
 ...
 TypeError: keys must be a string
-    ```
+```
 
-    Pairing functions could bypass this limitation.
+Pairing functions could bypass this limitation.
 
-    ```
+```python
 >>> dc = dict(zip([pair(*x) for x in d.keys()], d.values()))
 >>> dc
 {1573: 'foo'}
 >>> json.dumps(dc)
 '{"1573": "foo"}'
-    ```
+```
 
-    Both producer and consumer of JSON would need to agree on the details as to
+Both producer and consumer of JSON would need to agree on the details as to
 which keys to pair/depair. There are many reasons why not to choose this route
 (tight coupling, data fragility) but it might work in a pinch.
 
